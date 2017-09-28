@@ -1,13 +1,77 @@
 ﻿<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns='http://www.w3.org/1999/xhtml'>
 <head>
-  <meta charset="utf-8" />
-  <title>Upload images to server using Node JS</title>
+<meta charset='utf-8' />
+<title>Upload images to server using Node JS</title>
+<script src='https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js'></script>
 </head>
 <body>
-  <form id="frmUploader" enctype="multipart/form-data" action="api/Upload/" method="post">
-    <input type="file" name="imgUploader" multiple />
-    <input type="submit" name="submit" id="btnSubmit" value="Upload" />
+  <!-- <form id='frmUploader' enctype='multipart/form-data' action='api/Upload/' method='post'>
+    <input type='file' name='fileUploader' multiple />
+    <input type='submit' name='submit' id='btnSubmit' value='Upload' />
+  </form> -->
+  <form id='frmUploader'>
+    <input type='file' name='fileUploader' id='file' multiple />
+    <input type='button' id='btnSubmit' value='Upload' />
   </form>
+  <script type='text/javascript'>
+    $(function () {
+      var fileEl = $('#file')
+      fileEl.change(function () {
+        var files = this.files;
+        for (var i = 0; i < files.length; i++) {
+          var file = files[i];
+          console.log({
+            name: file.name,
+            size: file.size,
+            type: file.type
+          })
+        }
+      });
+
+      function fileUploader (formData, order) {
+        $.ajax({
+          url: '/api/Upload/',
+          type: 'POST',
+          xhr: function () {
+            myXhr = $.ajaxSettings.xhr();
+            if (myXhr.upload) {
+              myXhr.upload.addEventListener('progress', function (e) {
+                console.log({
+                  value: e.loaded,
+                  max: e.total
+                })
+              }, false);
+            }
+            return myXhr;
+          },
+          beforeSend: function (e) {
+            console.log('beforeSend!')
+          },
+          success: function (e) {
+            console.log(e)
+            console.log(order + 'th files uploaded successfully!')
+          },
+          error: function (e) {
+            console.log('error!')
+          },
+          data: formData,
+          cache: false,
+          contentType: false,
+          processData: false
+        });
+      }
+
+      $('#btnSubmit').on('click', function () {
+        var allFiles = fileEl[0].files;
+        for (var i = 0; i < allFiles.length; i++) {
+          var formData = new FormData();
+          formData.append('fileUploader', allFiles[i]);
+          fileUploader(formData, i)
+        }
+        
+      })
+    })
+  </script>
 </body>
 </html>

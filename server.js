@@ -18,7 +18,7 @@ const Storage = multer.diskStorage({
 })
 
 // Field name and max count
-const upload = multer({ storage: Storage }).array('imgUploader', 3)
+const upload = multer({ storage: Storage }).array('fileUploader', 20)
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html')
@@ -27,15 +27,23 @@ app.get('/', (req, res) => {
 app.post('/api/Upload', (req, res) => {
   upload(req, res, err => {
     if (err) {
-      return res.end('Something went wrong!')
+      // return res.end('Something went wrong!')
+      return res.json({
+        status: 0,
+        text: 'Something went wrong!'
+      })
     }
-    return res.end('File uploaded sucessfully!.')
+    // return res.end('File uploaded sucessfully!')
+    return res.json({
+      status: 1,
+      text: 'File uploaded sucessfully!'
+    })
   })
 })
 
 const port = 2000
 const uri = `http://${ip.address()}:${port}`
 
-app.listen(2000, a => {
+app.listen(port, a => {
   console.log(chalk.green(`Server is running at ${uri}`))
 });
